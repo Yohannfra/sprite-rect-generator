@@ -32,12 +32,14 @@ class Viewver:
         self.height = height
         self.scale_factor = 1
         self.viewx = 0
+        self.show_text = False
         self.viewy = 0
         self.draw()
 
         self.fen.bind_all("<Escape>", self.quit)
         self.fen.bind_all("<p>", self.zoom_in)
         self.fen.bind_all("<r>", self.reset_view)
+        self.fen.bind_all("<t>", self.toggle_show_text)
         self.fen.bind_all("<m>", self.zoom_out)
         self.fen.bind_all("<Right>", self.move_right)
         self.fen.bind_all("<Left>", self.move_left)
@@ -47,10 +49,16 @@ class Viewver:
         self.fen.mainloop()
 
 
+    def toggle_show_text(self, evt=None):
+        self.show_text = not self.show_text
+        self.draw()
+
+
     def reset_view(self, evt=None):
         self.viewx = 0
         self.viewy = 0
         self.scale_factor = 1
+        self.show_text = False
         self.draw()
 
     def move_right(self, evt=None):
@@ -95,10 +103,10 @@ class Viewver:
         self.can.delete("all")
         self.image = self.image.resize((self.width*self.scale_factor, self.height*self.scale_factor), Image.ANTIALIAS)
         self.photo = ImageTk.PhotoImage(self.image)
-        self.can.create_image(self.viewx,self.viewy, anchor="nw", image=self.photo)
+        self.can.create_image(self.viewx*self.scale_factor, self.viewy*self.scale_factor, anchor="nw", image=self.photo)
         for r in self.all_rects:
-            x1 = r.x1 * self.scale_factor + self.viewx
-            y1 = r.y1 * self.scale_factor + self.viewy
+            x1 = ((r.x1*self.scale_factor) + (self.viewx*self.scale_factor))
+            y1 = ((r.y1*self.scale_factor) + (self.viewy*self.scale_factor))
             if (win_width != 1 and x1 > win_width) or (win_height > 1 and y1 > win_height):
                 continue
             if x1 < 0 or y1 < 0:
@@ -106,18 +114,21 @@ class Viewver:
             x2 = (r.x2 + r.x1 + self.viewx) * self.scale_factor
             y2 = (r.y2 + r.y1 + self.viewy) * self.scale_factor
             self.can.create_rectangle(x1, y1, x2, y2)
+            if self.show_text:
+                self.can.create_text(x1+10, y1-10, text=str(r.x1)) # nw
+                self.can.create_text(x2-10, y1-10, text=str(r.x2)) # ne
+                self.can.create_text(x1+10, y2+10, text=str(r.y1)) # sw
+                self.can.create_text(x2-10, y2+10, text=str(r.y2)) # se
+
 
 class RectFinder:
     def __init__(self):
         pass
 
+
     def get_adjacents_pixels(self, width: int, height: int, y: int, x: int) -> List[Pixel]:
         global g_pixel_values
-
         arr = []
-
-        # if sl > 6000: # debug stackoverflow
-        #     return arr
 
         if g_pixel_values[(width * y) + x] == 0:
             return []
