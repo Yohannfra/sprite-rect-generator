@@ -4,12 +4,8 @@ from PIL import Image, ImageTk
 import sys
 from tkinter import Tk, Canvas
 from dataclasses import dataclass
-from typing import List
-
-@dataclass
-class Pixel:
-    x: int
-    y: int
+from typing import List, Tuple
+import time
 
 @dataclass
 class Rect:
@@ -18,11 +14,12 @@ class Rect:
     x2: int
     y2: int
 
-g_pixel_values: List[Pixel] = [] # this is a global to avoid stackoverflow on big images
+g_pixel_values = [] # this is a global to avoid stackoverflow on big images
 
 class Viewver:
     def __init__(self, all_rects, fp, width, height):
         self.fen = Tk()
+        # self.fen.geometry("100x100+-1000+400")
         self.fen.title(fp + " - " + str(width) + "x" + str(height))
         self.can = Canvas(self.fen, width=width, height=height, highlightthickness=0)
         self.can.pack(fill="both", expand=True)
@@ -126,35 +123,37 @@ class RectFinder:
         pass
 
 
-    def get_adjacents_pixels(self, width: int, height: int, y: int, x: int) -> List[Pixel]:
-        global g_pixel_values
-        arr = []
+    def get_adjacents_pixels(self, width: int, height: int, y: int, x: int):
+        arr_all_pixels = []
+        to_visit = []
 
-        if g_pixel_values[(width * y) + x] == 0:
-            return []
+        to_visit.append((y, x))
 
-        arr.append(Pixel(x, y))
-        g_pixel_values[(width * y) + x] = 0
+        while to_visit != []:
+            pix = to_visit.pop()
+            arr_all_pixels.append(pix)
+            g_pixel_values[width * (y) + (x)] = 0
+            y = pix[0]
+            x = pix[1]
 
-        if y > 0 and g_pixel_values[width * (y-1) + (x)] != 0: # N
-            arr += self.get_adjacents_pixels(width, height, y-1, x)
-        if y < height-1 and g_pixel_values[width * (y+1) + (x)] != 0: # S
-            arr += self.get_adjacents_pixels(width, height, y+1, x)
-        if x > 0 and g_pixel_values[width * (y) + (x-1)] != 0: # W
-            arr += self.get_adjacents_pixels(width, height, y, x-1)
-        if x < width-1 and g_pixel_values[width * (y) + (x+1)] != 0: # E
-            arr += self.get_adjacents_pixels(width, height, y, x+1)
+            if y > 0 and g_pixel_values[width * (y-1) + (x)] != 0: # N
+                to_visit.append((y-1, x))
+            if y < height-1 and g_pixel_values[width * (y+1) + (x)] != 0: # S
+                to_visit.append((y+1, x))
+            if x > 0 and g_pixel_values[width * (y) + (x-1)] != 0: # W
+                to_visit.append((y, x-1))
+            if x < width-1 and g_pixel_values[width * (y) + (x+1)] != 0: # E
+                to_visit.append((y, x+1))
 
-        if y > 0 and x < width-1 and g_pixel_values[width * (y-1) + (x+1)] != 0: # NE
-            arr += self.get_adjacents_pixels(width, height, y-1, x+1)
-        if y < height-1 and x < width-1 and g_pixel_values[width * (y+1) + (x+1)] != 0: # SE
-            arr += self.get_adjacents_pixels(width, height, y+1, x+1)
-        if x > 0 and y > 0 and g_pixel_values[width * (y-1) + (x-1)] != 0: # NW
-            arr += self.get_adjacents_pixels(width, height, y-1, x-1)
-        if y < height-1 and x > 0 and g_pixel_values[width * (y+1) + (x-1)] != 0: # SW
-            arr += self.get_adjacents_pixels(width, height, y+1, x-1)
-        return arr
-
+            if y > 0 and x < width-1 and g_pixel_values[width * (y-1) + (x+1)] != 0: # NE
+                to_visit.append((y-1, x+1))
+            if y < height-1 and x < width-1 and g_pixel_values[width * (y+1) + (x+1)] != 0: # SE
+                to_visit.append((y+1, x+1))
+            if x > 0 and y > 0 and g_pixel_values[width * (y-1) + (x-1)] != 0: # NW
+                to_visit.append((y-1, x-1))
+            if y < height-1 and x > 0 and g_pixel_values[width * (y+1) + (x-1)] != 0: # SW
+                to_visit.append((y+1, x-1))
+        return arr_all_pixels
 
     def get_rect_bounds(self, shape, image_witdh, image_height):
         ymin = image_height
@@ -162,35 +161,31 @@ class RectFinder:
         ymax = 0
         xmax = 0
         for pixel in shape:
-            if pixel.y < ymin:
-                ymin = pixel.y
-            elif pixel.y > ymax:
-                ymax = pixel.y
-            if pixel.x < xmin:
-                xmin = pixel.x
-            elif pixel.x > xmax:
-                xmax = pixel.x
+            if pixel[0] < ymin:
+                ymin = pixel[0]
+            elif pixel[0] > ymax:
+                ymax = pixel[0]
+            if pixel[1] < xmin:
+                xmin = pixel[1]
+            elif pixel[1] > xmax:
+                xmax = pixel[1]
         return xmin, ymin, (xmax-xmin+1), (ymax-ymin+1)
 
 
     def find_rects(self, image_witdh: int, image_height: int) -> List[Rect]:
         global g_pixel_values
-        already_visited = []
         all_rects = []
 
         for y in range(image_height):
             for x in range(image_witdh):
-                if g_pixel_values[image_witdh * y + x] != 0 and (y, x) not in already_visited: # non transparent pixel
+                if g_pixel_values[image_witdh * y + x] != 0: # non transparent pixel
                     shape = self.get_adjacents_pixels(image_witdh, image_height, y, x)
                     x1,y1,x2,y2 = self.get_rect_bounds(shape, image_witdh, image_height)
                     min_size = 0
                     if not (x1 < min_size or x2 < min_size or y1 < min_size or y2 < min_size):
-                        # all_rects.append([x1,y1,x2,y2])
                         all_rects.append(Rect(x1,y1,x2,y2))
                     else:
-                        # print(x1, y1, x2, y2)
                         pass
-                    already_visited += shape
         return all_rects
 
 
@@ -210,8 +205,10 @@ def main(argc: int, argv: List[str]):
     image_witdh, image_height = im.size
     g_pixel_values = list(im.getdata())
     r = RectFinder()
+    start_time = time.time()
     all_rects = r.find_rects(image_witdh, image_height)
-    # print(all_rects)
+    end_time = time.time()
+    print(f"Found {len(all_rects)} rectangles in {round(end_time - start_time, 3)} s")
     Viewver(all_rects, argv[0], image_witdh, image_height)
 
 
