@@ -7,7 +7,7 @@ fi
 
 set -e
 
-python setup.py install
+python3 setup.py install
 
 echo -ne "#!/bin/bash\n\npython3 -m rect_generator \"\$@\"\n" > build/rect_generator
 chmod +x build/rect_generator
