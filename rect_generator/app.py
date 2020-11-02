@@ -31,16 +31,21 @@ def main(argc: int, argv: List[str]):
     if argc != 1:
         sys.exit(f"USAGE: rect_generator spritesheet")
     try:
+        print(f"Reading {argv[0]}")
         im = Image.open(argv[0], 'r')
     except:
         sys.exit("Could not read/load image")
     image_width, image_height = im.size
     pixel_values = list(im.getdata())
+    print("Cleaning pixels")
     clean_pixel_array(pixel_values)
+    print("Searching for rectangles")
     r = rect_finder.RectFinder()
     start_time = time.time()
     all_rects = r.find_rects(pixel_values, image_width, image_height)
     end_time = time.time()
     print(
         f"Found {len(all_rects)} rectangles in {round(end_time-start_time, 3)} s")
+    print("Starting gui")
     viewer.run(all_rects, argv[0], image_width, image_height)
+    print("Bye")
