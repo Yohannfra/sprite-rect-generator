@@ -1,6 +1,7 @@
 from PIL import Image, ImageTk
 from tkinter import Tk, Canvas
 
+
 class Viewver:
     def __init__(self, all_rects, fp, width, height):
         self.fen = Tk()
@@ -86,12 +87,12 @@ class Viewver:
         self.image = self.image.resize((self.width*self.scale_factor, self.height*self.scale_factor), Image.ANTIALIAS)
         self.photo = ImageTk.PhotoImage(self.image)
         self.can.create_image(self.viewx*self.scale_factor, self.viewy*self.scale_factor, anchor="nw", image=self.photo)
+
         for r in self.all_rects:
             x1 = ((r.x1*self.scale_factor) + (self.viewx*self.scale_factor))
             y1 = ((r.y1*self.scale_factor) + (self.viewy*self.scale_factor))
-            if (win_width != 1 and x1 > win_width) or (win_height > 1 and y1 > win_height):
-                continue
-            if x1 < 0 or y1 < 0:
+            if (win_width != 1 and x1 > win_width) or (win_height > 1 and \
+                                        y1 > win_height) or x1 < 0 or y1 < 0:
                 continue
             x2 = (r.x2 + r.x1 + self.viewx) * self.scale_factor
             y2 = (r.y2 + r.y1 + self.viewy) * self.scale_factor

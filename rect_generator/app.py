@@ -2,6 +2,7 @@ from PIL import Image
 import sys
 from dataclasses import dataclass
 from typing import List, Tuple
+from signal import signal, SIGINT
 import time
 from rect_generator.rect_finder import rect_finder
 from rect_generator.viewer import viewer
@@ -24,7 +25,15 @@ def clean_pixel_array(arr):
             arr[i] = 1
 
 
+def sigint_handler(signal_received, frame):
+    ''' quit faster when tkinter is lagging with the draw '''
+    print("SIGINT or CTRL-C detected. Bye")
+    exit(1)
+
+
 def main(argc: int, argv: List[str]):
+    signal(SIGINT, sigint_handler)
+
     argc -= 1
     argv = argv[1:]
 
