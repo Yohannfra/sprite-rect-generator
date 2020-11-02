@@ -77,14 +77,9 @@ class RectFinder:
 
     def find_rects(self, pixel_values, image_witdh: int, image_height: int) -> List[Rect]:
         all_rects = []
-
         for y in range(image_height):
             for x in range(image_witdh):
-                if pixel_values[image_witdh * y + x] > 15 and \
-                    pixel_values[image_witdh * y + x] != (0,0,0,0) and \
-                        pixel_values[image_witdh * y + x] != 255: # non transparent pixel
-                    print(x, y)
-                    print(pixel_values[image_witdh * y + x])
+                if pixel_values[image_witdh * y + x] != 0:
                     shape = self.get_adjacents_pixels(pixel_values, image_witdh, image_height, y, x)
                     x1,y1,x2,y2 = self.get_rect_bounds(shape, image_witdh, image_height)
                     min_size = 0
