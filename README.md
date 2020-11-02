@@ -9,8 +9,8 @@ A python gui that auto create sprites rectangles on spritesheets.
 ### Installation
 
 ```
-$ git@github.com:Yohannfra/sprite-rect-generator.git
-$ sudo install.sh
+$ git clone git@github.com:Yohannfra/sprite-rect-generator.git
+$ sudo ./install.sh
 ```
 
 > The executable is installed in ~/.local/bin/
