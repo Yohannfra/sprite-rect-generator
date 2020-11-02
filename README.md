@@ -8,11 +8,12 @@ A python gui that auto create sprites rectangles on spritesheets.
 
 ### Installation
 
-Clone this repository
+```
+$ git@github.com:Yohannfra/sprite-rect-generator.git
+$ sudo install.sh
+```
 
-```
-git@github.com:Yohannfra/sprite-rect-generator.git
-```
+> The executable is installed in ~/.local/bin/
 
 If you have troubles with missing **PIL** or **ImageTk** checkout [this link](https://stackoverflow.com/questions/44835909/cannot-import-name-imagetk-python-3-5).
 
@@ -21,7 +22,7 @@ If you have troubles with missing **PIL** or **ImageTk** checkout [this link](ht
 ### Usage
 
 ```
-./rect_generator spritesheet
+rect_generator spritesheet
 ```
 
 ---
