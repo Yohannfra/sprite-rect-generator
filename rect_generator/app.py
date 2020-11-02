@@ -18,7 +18,7 @@ def clean_pixel_array(arr):
     for i in range(len(arr)):
         if arr[i] == 0 or \
             (type(arr[i]) != int and len(arr[i]) == 3 and arr[i] == (0,0,0)) or \
-                (type(arr[i]) != int and len(arr[i]) == 4 and arr[i] == (0,0,0,0)):
+                (type(arr[i]) != int and len(arr[i]) == 4 and arr[i][3] == 0):
             arr[i] = 0
         else:
             arr[i] = 1
