@@ -92,5 +92,7 @@ I haven't tested any other format yet but feel free to open an issue if you thin
 
 ![screenshot](.github/when_in_resize_mode.png)
 
+---
+
 ## Licence
     This project is licensed under the terms of the MIT license.
