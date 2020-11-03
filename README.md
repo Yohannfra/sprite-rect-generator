@@ -45,9 +45,9 @@ rect_generator spritesheet
 | Right                            | Move view 40 px right        |
 | Up                               | Move view 40 px up           |
 | Down                             | Move view 40 px down         |
-| Escape                           | Quit                         |
 | Mouse Left Click                 | Select a rectangle           |
 | u (when a rectangle is selected) | Enable **resize mode**       |
+| Escape                           | Quit                         |
 
 #### When in Resize mode:
 
@@ -61,7 +61,6 @@ rect_generator spritesheet
 | Right                                       | Add one pixel on the right side                |
 | Up                                          | Add one pixel on the top side                  |
 | Down                                        | Add one pixel on the bottom side               |
-| Escape                                      | Quit                                           |
 | Mouse Left Click (on a different rectangle) | Select the rectangle and switch to normal mode |
 | u                                           | Disable **resize mode**                        |
 
