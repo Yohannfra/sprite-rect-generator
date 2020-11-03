@@ -4,3 +4,4 @@ __pycache__
 build
 dist/
 rect_generator_yohann.egg-info/
+*.pyc
