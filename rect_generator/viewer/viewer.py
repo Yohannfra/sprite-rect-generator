@@ -205,8 +205,8 @@ class Viewver:
             if self.show_text or r == self.selected_rect:
                 self.can.create_text(x1+10, y1-10, text=str(r.x1), tag="txt") # nw
                 self.can.create_text(x2-10, y1-10, text=str(r.x2), tag="txt") # ne
-                self.can.create_text(x1+10, y2+10, text=str(r.y1), tag="txt") # sw
-                self.can.create_text(x2-10, y2+10, text=str(r.y2), tag="txt") # se
+                self.can.create_text(x1-10, y1+10, text=str(r.y1), tag="txt") # sw
+                self.can.create_text(x1-10, y2, text=str(r.y2), tag="txt") # se
 
 
     def draw_image(self):
