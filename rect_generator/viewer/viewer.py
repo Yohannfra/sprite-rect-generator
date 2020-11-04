@@ -1,14 +1,16 @@
 from PIL import Image, ImageTk
-from tkinter import Tk, Canvas
+from tkinter import Tk, Canvas, Toplevel, Button
+import tkinter.messagebox
 
 
 class Viewver:
     def __init__(self, all_rects, fp, width, height):
         self.fen = Tk()
         self.fen.title(fp + " - " + str(width) + "x" + str(height))
-        self.can = Canvas(self.fen, width=width, height=height, highlightthickness=0)
+        self.fen.geometry("1280x720")
+        self.can = Canvas(self.fen, width=width, height=height, highlightthickness=0, bg="white")
         self.can.pack(fill="both", expand=True)
-        self.image = Image.open(fp)
+        self.initial_image = Image.open(fp)
         self.all_rects = all_rects
         self.width = width
         self.height = height
@@ -159,18 +161,22 @@ class Viewver:
 
 
     def quit(self, evt=None):
-        self.fen.quit()
-        self.fen.destroy()
+        if tkinter.messagebox.askokcancel(title="Quit", message="Quit ?"):
+            self.fen.quit()
+            self.fen.destroy()
 
 
     def zoom_in(self, evt=None):
-        self.scale_factor += 1
+        self.scale_factor *= 2
         self.draw_all()
 
 
     def zoom_out(self, evt=None):
-        if self.scale_factor > 1:
-            self.scale_factor -= 1
+        new_factor = self.scale_factor / 2
+        if new_factor <= 0.1:
+            tkinter.messagebox.showerror(title="Error", message="you can't zoom out anymore")
+        else:
+            self.scale_factor = new_factor
             self.draw_all()
 
 
@@ -206,7 +212,7 @@ class Viewver:
     def draw_image(self):
         self.can.delete("img")
 
-        self.image = self.image.resize((self.width*self.scale_factor, self.height*self.scale_factor), Image.ANTIALIAS)
+        self.image = self.initial_image.resize((int(self.width*self.scale_factor), int(self.height*self.scale_factor)), Image.ANTIALIAS)
         self.photo = ImageTk.PhotoImage(self.image)
         self.can.create_image(self.viewx*self.scale_factor, self.viewy*self.scale_factor, anchor="nw", image=self.photo, tag="img")
 
